@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" id="root">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FarmProof — Oracle Engine</title>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #030712
+        }
+
+        html.light body {
+            background: #f0f9ff !important
+        }
+
+        html.light nav {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border-color: #e2e8f0 !important
+        }
+
+        html.light .bg-gray-900 {
+            background: #ffffff !important
+        }
+
+        html.light .bg-gray-800 {
+            background: #f1f5f9 !important
+        }
+
+        html.light .bg-gray-800\/60 {
+            background: #f8fafc !important
+        }
+
+        html.light .bg-gray-950\/90 {
+            background: rgba(255, 255, 255, 0.95) !important
+        }
+
+        html.light .text-white {
+            color: #0f172a !important
+        }
+
+        html.light .text-gray-300 {
+            color: #334155 !important
+        }
+
+        html.light .text-gray-400 {
+            color: #475569 !important
+        }
+
+        html.light .text-gray-500 {
+            color: #64748b !important
+        }
+
+        html.light .border-gray-800 {
+            border-color: #e2e8f0 !important
+        }
+
+        html.light .border-gray-700 {
+            border-color: #cbd5e1 !important
+        }
+
+        html.light .bg-gray-700 {
+            background: #e2e8f0 !important
+        }
+
+        body,
+        nav,
+        .bg-gray-900,
+        .bg-gray-800,
+        .text-white,
+        .text-gray-400,
+        .border-gray-800 {
+            transition: background .25s, color .25s, border-color .25s
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-white">
+
+    <nav class="fixed top-0 inset-x-0 z-50 flex items-center gap-2 px-4 md:px-5 border-b border-gray-800 bg-gray-950/90 backdrop-blur-xl"
+        style="height:60px">
+        <a href="index.html" data-portal
+            class="flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>Back
+        </a>
+        <div class="w-px h-5 bg-gray-700"></div>
+        <div class="flex items-center gap-2 font-black text-base">Farm<span class="text-emerald-400">Proof</span></div>
+        <div class="flex-1"></div>
+        <button id="theme-btn" onclick="toggleTheme()"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 text-sm transition-all"
+            title="Toggle light/dark">
+            <span id="theme-icon">🌙</span>
+        </button>
+        <div id="live-badge"
+            class="flex items-center gap-2 text-xs font-semibold text-gray-400 bg-gray-800 border border-gray-700 px-3 py-1.5 rounded-full">
+            <span class="w-2 h-2 rounded-full bg-gray-500"></span>Connecting…
+        </div>
+    </nav>
+
+    <main class="pt-20 pb-16 px-4 md:px-6 max-w-6xl mx-auto">
+        <div class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-black mb-1">Oracle Engine</h1>
+            <p class="text-gray-400 text-sm">Live data from 3 independent sources. When all 3 thresholds are crossed
+                simultaneously, the smart contract fires automatic payouts — saved to demoDatabase.json instantly.</p>
+        </div>
+
+        <!-- Countdown -->
+        <div class="flex items-center gap-3 bg-gray-900 border border-gray-800 rounded-2xl p-4 mb-5 flex-wrap">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-400 dot-pulse flex-shrink-0"></span>
+            <span class="text-sm font-semibold text-gray-300">Next oracle fetch in:</span>
+            <div class="flex-1 min-w-24 bg-gray-700 rounded-full h-2 overflow-hidden">
+                <div id="tick-bar" class="bg-blue-500 h-full rounded-full transition-all duration-1000"
+                    style="width:100%"></div>
+            </div>
+            <span id="tick-label" class="font-mono text-blue-400 font-bold text-sm flex-shrink-0">30s</span>
+            <span id="fetch-count" class="text-xs text-gray-500">0 reads</span>
+            <span id="oracle-status"
+                class="text-xs font-bold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-2.5 py-1 rounded-full ml-auto">Monitoring</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <!-- LEFT -->
+            <div class="space-y-4">
+                <!-- Data Sources -->
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold">Data Sources</h2>
+                        <span
+                            class="text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full">3
+                            active</span>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="flex items-center gap-3 bg-gray-800 rounded-xl p-3"><span class="text-xl">🌦️</span>
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold">Open-Meteo API</div>
+                                <div class="text-xs text-gray-400">Rainfall, temperature, humidity, wind · 6-hourly
+                                </div>
+                            </div><span
+                                class="text-xs font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full">Live</span>
+                        </div>
+                        <div class="flex items-center gap-3 bg-gray-800 rounded-xl p-3"><span class="text-xl">🛰️</span>
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold">Copernicus Sentinel-2</div>
+                                <div class="text-xs text-gray-400">NDVI crop health index · Sunamganj 25.07°N, 91.00°E
+                                </div>
+                            </div><span
+                                class="text-xs font-bold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-2 py-0.5 rounded-full">Simulated</span>
+                        </div>
+                        <div class="flex items-center gap-3 bg-gray-800 rounded-xl p-3"><span class="text-xl">🌊</span>
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold">FFWC Bangladesh</div>
+                                <div class="text-xs text-gray-400">Surma River · Station SUR-07 · Sunamganj</div>
+                            </div><span
+                                class="text-xs font-bold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-2 py-0.5 rounded-full">Simulated</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trigger Conditions -->
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="font-bold">Trigger Conditions</h2>
+                        <span class="text-xs text-gray-500">ALL 3 must be exceeded</span>
+                    </div>
+                    <div class="text-xs text-gray-600 font-mono mb-4">InsurancePool.sol · evaluateTrigger()</div>
+                    <div class="space-y-2.5" id="cond-list">
+                        <div id="ci-rain"
+                            class="flex items-center justify-between border border-gray-700 rounded-xl p-3.5 transition-all duration-500">
+                            <div class="flex items-center gap-3"><span class="text-xl">🌧️</span>
+                                <div>
+                                    <div class="font-semibold text-sm">72h Rainfall</div>
+                                    <div id="expr-rain" class="text-xs text-gray-500 font-mono mt-0.5">rainfall > 200mm
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div id="cv-rain" class="font-black text-lg font-mono">—</div><span id="cb-rain"
+                                    class="text-xs font-bold text-gray-500 bg-gray-700 px-2 py-0.5 rounded-full">PENDING</span>
+                            </div>
+                        </div>
+                        <div id="ci-ndvi"
+                            class="flex items-center justify-between border border-gray-700 rounded-xl p-3.5 transition-all duration-500">
+                            <div class="flex items-center gap-3"><span class="text-xl">🛰️</span>
+                                <div>
+                                    <div class="font-semibold text-sm">NDVI Drop</div>
+                                    <div id="expr-ndvi" class="text-xs text-gray-500 font-mono mt-0.5">ndvi_drop > 40%
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div id="cv-ndvi" class="font-black text-lg font-mono">—</div><span id="cb-ndvi"
+                                    class="text-xs font-bold text-gray-500 bg-gray-700 px-2 py-0.5 rounded-full">PENDING</span>
+                            </div>
+                        </div>
+                        <div id="ci-river"
+                            class="flex items-center justify-between border border-gray-700 rounded-xl p-3.5 transition-all duration-500">
+                            <div class="flex items-center gap-3"><span class="text-xl">🌊</span>
+                                <div>
+                                    <div class="font-semibold text-sm">River Level</div>
+                                    <div id="expr-river" class="text-xs text-gray-500 font-mono mt-0.5">river_level >
+                                        8.5m</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div id="cv-river" class="font-black text-lg font-mono">—</div><span id="cb-river"
+                                    class="text-xs font-bold text-gray-500 bg-gray-700 px-2 py-0.5 rounded-full">PENDING</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-4">
+                        <button id="btn-flood"
+                            class="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 active:bg-red-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Simulate Flash Flood
+                        </button>
+                        <button id="btn-reset"
+                            class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 font-semibold py-2.5 px-4 rounded-xl text-sm transition-all">Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="space-y-4">
+                <!-- Verdict -->
+                <div id="verdict-card"
+                    class="border border-gray-700 rounded-2xl p-5 text-center transition-all duration-500">
+                    <div id="verdict-icon" class="text-4xl mb-3">🌤️</div>
+                    <div id="verdict-title" class="text-lg font-black mb-1">All Conditions Normal</div>
+                    <div id="verdict-sub" class="text-sm text-gray-400">Oracle monitoring · No payout triggered</div>
+                </div>
+
+                <!-- Snapshot -->
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="font-bold">Current Readings</h2>
+                        <span id="snapshot-time" class="text-xs text-gray-500">—</span>
+                    </div>
+                    <div id="snapshot-grid" class="grid grid-cols-3 gap-2"></div>
+                </div>
+
+                <!-- Execution log -->
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold">Execution Log</h2>
+                        <span id="exec-chip"
+                            class="text-xs font-bold text-gray-400 bg-gray-700 px-2.5 py-1 rounded-full">Idle</span>
+                    </div>
+                    <div class="space-y-2.5" id="step-list">
+                        <div id="st1"
+                            class="flex items-start gap-3 rounded-xl border border-gray-800 p-3 opacity-30 transition-all duration-400">
+                            <div id="sn1"
+                                class="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                                1</div>
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold">Oracle data validated</div>
+                                <div class="text-xs text-gray-500">All 3 sources agree on readings</div>
+                            </div>
+                            <div id="si1" class="text-base flex-shrink-0 mt-0.5">⏳</div>
+                        </div>
+                        <div id="st2"
+                            class="flex items-start gap-3 rounded-xl border border-gray-800 p-3 opacity-30 transition-all duration-400">
+                            <div id="sn2"
+                                class="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                                2</div>
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold">evaluateTrigger() called</div>
+                                <div class="text-xs text-gray-500">Smart contract processes oracle calldata</div>
+                            </div>
+                            <div id="si2" class="text-base flex-shrink-0 mt-0.5">⏳</div>
+                        </div>
+                        <div id="st3"
+                            class="flex items-start gap-3 rounded-xl border border-gray-800 p-3 opacity-30 transition-all duration-400">
+                            <div id="sn3"
+                                class="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                                3</div>
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold">Block mined on Polygon</div>
+                                <div id="sub3" class="text-xs text-gray-500">~2s finality</div>
+                            </div>
+                            <div id="si3" class="text-base flex-shrink-0 mt-0.5">⏳</div>
+                        </div>
+                        <div id="st4"
+                            class="flex items-start gap-3 rounded-xl border border-gray-800 p-3 opacity-30 transition-all duration-400">
+                            <div id="sn4"
+                                class="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                                4</div>
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold">Payouts transferred to wallets</div>
+                                <div id="sub4" class="text-xs text-gray-500">Awaiting trigger…</div>
+                            </div>
+                            <div id="si4" class="text-base flex-shrink-0 mt-0.5">⏳</div>
+                        </div>
+                    </div>
+
+                    <div id="pay-result"
+                        class="hidden mt-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-5 text-center slide-up">
+                        <div class="text-4xl mb-2 pop-in">💸</div>
+                        <div id="pr-amount" class="text-3xl font-black text-emerald-400">৳0</div>
+                        <div class="text-sm text-gray-300 mt-1 mb-2">Total payout executed automatically · Saved to
+                            demoDatabase.json</div>
+                        <div id="pr-hash" class="text-xs text-gray-500 font-mono mb-1">—</div>
+                        <div id="pr-footer" class="text-xs text-gray-500">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="fp-toast"></div>
+    <script src="shared.js"></script>
+    <script>
+        let reads = 0, tickSec = 30, tickTimer;
+
+        function setCond(key, val, met) {
+            const item = document.getElementById('ci-' + key);
+            const chip = document.getElementById('cb-' + key);
+            const valEl = document.getElementById('cv-' + key);
+            // Reset classes
+            item.className = 'flex items-center justify-between rounded-xl p-3.5 transition-all duration-500 border';
+            if (met) {
+                item.classList.add('border-red-500/50', 'bg-red-500/5');
+                chip.className = 'text-xs font-bold text-red-400 bg-red-400/10 border border-red-400/20 px-2 py-0.5 rounded-full';
+                chip.textContent = 'MET ⚠';
+                valEl.className = 'font-black text-lg font-mono text-red-400';
+            } else {
+                item.classList.add('border-emerald-500/30', 'bg-emerald-500/5');
+                chip.className = 'text-xs font-bold text-gray-400 bg-gray-700 px-2 py-0.5 rounded-full';
+                chip.textContent = 'SAFE';
+                valEl.className = 'font-black text-lg font-mono text-white';
+            }
+            valEl.textContent = val;
+        }
+
+        function setSnapshot(data) {
+            document.getElementById('snapshot-time').textContent = 'Updated ' + UI.formatTime(new Date());
+            document.getElementById('snapshot-grid').innerHTML = [
+                ['🌧️', 'Rainfall', data.rainfall.toFixed(1), 'mm'],
+                ['🛰️', 'NDVI', data.ndvi.toFixed(1), '%'],
+                ['🌊', 'River', data.river.toFixed(2), 'm'],
+                ['🌡️', 'Temp', data.temp.toFixed(1), '°C'],
+                ['💧', 'Humidity', data.humidity, '%'],
+                ['🌬️', 'Wind', data.wind.toFixed(1), 'km/h'],
+            ].map(([i, l, v, u]) => `<div class="bg-gray-800 rounded-xl p-2.5 text-center"><div class="text-base">${i}</div><div class="text-xs text-gray-500 mt-0.5">${l}</div><div class="text-sm font-bold mt-0.5">${v}<span class="text-xs text-gray-500"> ${u}</span></div></div>`).join('');
+        }
+
+        function setVerdict(allMet) {
+            const c = document.getElementById('verdict-card');
+            if (allMet) {
+                c.className = 'bg-red-500/10 border border-red-500/40 rounded-2xl p-5 text-center transition-all duration-500';
+                document.getElementById('verdict-icon').textContent = '🚨';
+                document.getElementById('verdict-title').textContent = 'FLASH FLOOD DETECTED';
+                document.getElementById('verdict-sub').textContent = 'All 3 thresholds exceeded — payout executing…';
+            } else {
+                c.className = 'bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-5 text-center transition-all duration-500';
+                document.getElementById('verdict-icon').textContent = '🌤️';
+                document.getElementById('verdict-title').textContent = 'All Conditions Normal';
+                document.getElementById('verdict-sub').textContent = 'Oracle monitoring · No payout triggered';
+            }
+        }
+
+        async function oracleFetch(flood) {
+            reads++;
+            document.getElementById('fetch-count').textContent = reads + ' reads';
+            const data = OracleEngine.simulate(flood);
+            const result = OracleEngine.evaluate(data);
+            const t = AppState.thresholds;
+            document.getElementById('expr-rain').textContent = `rainfall > ${t.rainfall}mm`;
+            document.getElementById('expr-ndvi').textContent = `ndvi_drop > ${t.ndvi}%`;
+            document.getElementById('expr-river').textContent = `river_level > ${t.river}m`;
+            setCond('rain', data.rainfall.toFixed(1) + 'mm', result.rainfall.met);
+            setCond('ndvi', data.ndvi.toFixed(1) + '%', result.ndvi.met);
+            setCond('river', data.river.toFixed(2) + 'm', result.river.met);
+            setSnapshot(data);
+            setVerdict(result.allMet);
+            return { data, result };
+        }
+
+        function stepOn(n) {
+            const st = document.getElementById('st' + n), sn = document.getElementById('sn' + n);
+            st.classList.remove('opacity-30');
+            st.classList.add('border-blue-500/40', 'bg-blue-500/5');
+            sn.className = 'w-6 h-6 rounded-full border-2 border-blue-400 text-blue-400 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5';
+            document.getElementById('si' + n).textContent = '⏳';
+        }
+        function stepOk(n, sub) {
+            const st = document.getElementById('st' + n), sn = document.getElementById('sn' + n);
+            st.classList.remove('border-blue-500/40', 'bg-blue-500/5');
+            st.classList.add('border-emerald-500/30', 'bg-emerald-500/5');
+            sn.className = 'w-6 h-6 rounded-full bg-emerald-500 text-gray-950 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 pop-in';
+            sn.textContent = '✓';
+            document.getElementById('si' + n).textContent = '✅';
+            if (sub) { const s = document.getElementById('sub' + n); if (s) s.textContent = sub; }
+        }
+        function resetSteps() {
+            [1, 2, 3, 4].forEach(n => {
+                const st = document.getElementById('st' + n), sn = document.getElementById('sn' + n);
+                st.classList.add('opacity-30'); st.classList.remove('border-blue-500/40', 'bg-blue-500/5', 'border-emerald-500/30', 'bg-emerald-500/5');
+                sn.className = 'w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5';
+                sn.textContent = n; document.getElementById('si' + n).textContent = '⏳';
+                if (document.getElementById('sub' + n)) document.getElementById('sub' + n).textContent = n === 4 ? 'Awaiting trigger…' : '~2s finality';
+            });
+        }
+
+        document.getElementById('btn-flood').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-flood');
+            btn.disabled = true; btn.textContent = '⏳ Executing…';
+            document.getElementById('pay-result').classList.add('hidden');
+            resetSteps();
+            document.getElementById('exec-chip').textContent = 'Running…';
+            document.getElementById('exec-chip').className = 'text-xs font-bold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-2.5 py-1 rounded-full';
+            document.getElementById('oracle-status').textContent = 'FLOOD EVENT';
+            document.getElementById('oracle-status').className = 'text-xs font-bold text-red-400 bg-red-400/10 border border-red-400/20 px-2.5 py-1 rounded-full ml-auto';
+
+            const t0 = Date.now();
+            await oracleFetch(true);
+            Blockchain.addEntry('oracle', 'Oracle Engine', 'FLOOD: RF=237.5mm NDVI=62.4% River=9.8m – All thresholds exceeded');
+
+            stepOn(1); await UI.delay(900); stepOk(1);
+            stepOn(2); await UI.delay(1200); stepOk(2);
+            stepOn(3); await UI.delay(1600);
+            const blk = Blockchain.nextBlock();
+            stepOk(3, `Block #${blk.toLocaleString()} mined · Gas: 0.001 MATIC`);
+            stepOn(4); await UI.delay(1300);
+
+            const farmers = AppState.farmers;
+            let total = 0;
+            farmers.forEach(f => {
+                if (!f.paid) {
+                    f.paid = true; f.payoutTx = Blockchain.randomHex(); f.payoutBlock = blk;
+                    total += f.coverage;
+                    AppState.poolBalance = Math.max(0, AppState.poolBalance - f.coverage);
+                    AppState.payoutCount = (AppState.payoutCount || 0) + 1;
+                    AppState.payoutTotal = (AppState.payoutTotal || 0) + f.coverage;
+                    Blockchain.addEntry('payout', 'InsurancePool.sol', `Payout ৳${f.coverage.toLocaleString()} → ${f.name} (${f.wallet})`, { amount: f.coverage, block: blk });
+                }
+            });
+            if (!total) total = 175000;
+            stepOk(4, `৳${total.toLocaleString()} sent to ${farmers.length || 4} wallets · Zero human intervention`);
+            AppState.floodSimulated = true;
+
+            // ★ Single explicit save with 'payout' event — broadcasts to ALL open tabs via SSE
+            AppState.save('payout', { total, farmers: farmers.length, block: blk });
+
+            const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+            document.getElementById('pay-result').classList.remove('hidden');
+            document.getElementById('pr-amount').textContent = '৳' + total.toLocaleString();
+            document.getElementById('pr-hash').textContent = 'TxHash: ' + Blockchain.randomHex().slice(0, 18) + '…';
+            document.getElementById('pr-footer').textContent = `${elapsed}s execution · ${farmers.length || 4} farmers paid · Polygon Amoy · Persisted to demoDatabase.json`;
+            document.getElementById('exec-chip').textContent = 'Completed';
+            document.getElementById('exec-chip').className = 'text-xs font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2.5 py-1 rounded-full';
+            UI.showToast('🎉 Auto-payout executed! Saved to demoDatabase.json', 'success');
+        });
+
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            AppState.floodSimulated = false;
+            AppState.farmers.forEach(f => { f.paid = false; delete f.payoutTx; });
+            AppState.save('update', {});
+            document.getElementById('btn-flood').disabled = false;
+            document.getElementById('btn-flood').innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Simulate Flash Flood';
+            document.getElementById('pay-result').classList.add('hidden');
+            document.getElementById('oracle-status').textContent = 'Monitoring';
+            document.getElementById('oracle-status').className = 'text-xs font-bold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-2.5 py-1 rounded-full ml-auto';
+            resetSteps(); oracleFetch(false);
+            UI.showToast('Trigger reset · demoDatabase.json updated', 'info');
+        });
+
+        function startTick() {
+            let rem = tickSec; clearInterval(tickTimer);
+            tickTimer = setInterval(() => {
+                rem--;
+                document.getElementById('tick-label').textContent = rem + 's';
+                document.getElementById('tick-bar').style.width = (rem / tickSec * 100) + '%';
+                if (rem <= 0) { rem = tickSec; if (!AppState.floodSimulated) oracleFetch(false); }
+            }, 1000);
+        }
+
+        /* ── Init ── */
+        (async () => {
+            await AppState.init();
+            const badge = document.getElementById('live-badge');
+            badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-blue-400 dot-pulse"></span>Live · Oracle Engine';
+            badge.className = 'flex items-center gap-2 text-xs font-semibold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-3 py-1.5 rounded-full';
+
+            StateEvents.on('reset', () => {
+                oracleFetch(false);
+                document.getElementById('pay-result').classList.add('hidden');
+                resetSteps();
+                UI.showToast('🔄 State reset', 'info');
+            });
+
+            await WeatherService.fetch();
+            await oracleFetch(AppState.floodSimulated);
+            if (AppState.floodSimulated) setVerdict(true);
+            startTick();
+        })();
+        /* ── Theme ── */
+        let _theme = localStorage.getItem('fp_theme') || 'dark';
+        function applyTheme(t) {
+            _theme = t;
+            document.getElementById('root').classList.toggle('light', t === 'light');
+            document.getElementById('root').classList.toggle('dark', t !== 'light');
+            document.getElementById('theme-icon').textContent = t === 'light' ? '☀️' : '🌙';
+            localStorage.setItem('fp_theme', t);
+        }
+        function toggleTheme() { applyTheme(_theme === 'dark' ? 'light' : 'dark'); }
+        applyTheme(_theme);
+    </script>
+</body>
+
+</html>

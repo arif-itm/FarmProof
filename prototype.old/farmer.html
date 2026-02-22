@@ -1,0 +1,832 @@
+<html lang="en" id="root">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FarmProof — Farmer Portal</title>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #030712
+        }
+
+        /* ── LIGHT MODE OVERRIDES ── */
+        html.light body {
+            background: #f0f9ff !important
+        }
+
+        html.light nav {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border-color: #e2e8f0 !important
+        }
+
+        html.light .bg-gray-900,
+        html.light .bg-gray-900.border-gray-800 {
+            background: #ffffff !important
+        }
+
+        html.light .bg-gray-800 {
+            background: #f1f5f9 !important
+        }
+
+        html.light .bg-gray-800\/60 {
+            background: #f8fafc !important
+        }
+
+        html.light .bg-gray-900\/60 {
+            background: #ffffff !important
+        }
+
+        html.light .bg-gray-950\/90 {
+            background: rgba(255, 255, 255, 0.95) !important
+        }
+
+        html.light .text-white {
+            color: #0f172a !important
+        }
+
+        html.light .text-gray-300 {
+            color: #334155 !important
+        }
+
+        html.light .text-gray-400 {
+            color: #475569 !important
+        }
+
+        html.light .text-gray-500 {
+            color: #64748b !important
+        }
+
+        html.light .text-gray-600 {
+            color: #94a3b8 !important
+        }
+
+        html.light .border-gray-800 {
+            border-color: #e2e8f0 !important
+        }
+
+        html.light .border-gray-700 {
+            border-color: #cbd5e1 !important
+        }
+
+        html.light .bg-gray-700 {
+            background: #e2e8f0 !important
+        }
+
+        html.light input,
+        html.light select {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important
+        }
+
+        html.light .tab-btn.active {
+            background: #ffffff !important;
+            color: #0f172a !important
+        }
+
+        html.light .tab-btn {
+            color: #64748b !important
+        }
+
+        html.light .font-mono {
+            color: #1e40af
+        }
+
+        html.light a[data-portal]:hover {
+            color: #0f172a !important
+        }
+
+        /* animate theme switch */
+        body,
+        nav,
+        .bg-gray-900,
+        .bg-gray-800,
+        .text-white,
+        .text-gray-400,
+        .border-gray-800 {
+            transition: background .25s, color .25s, border-color .25s
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-white">
+
+    <nav class="fixed top-0 inset-x-0 z-50 flex items-center gap-2 px-4 md:px-5 border-b border-gray-800 bg-gray-950/90 backdrop-blur-xl"
+        style="height:60px">
+        <a href="index.html" data-portal
+            class="flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span data-i18n="back">Back</span>
+        </a>
+        <div class="w-px h-5 bg-gray-700"></div>
+        <div class="flex items-center gap-2 font-black text-base">Farm<span class="text-emerald-400">Proof</span></div>
+        <div class="flex-1"></div>
+
+        <!-- Theme toggle -->
+        <button id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 text-sm transition-all"
+            aria-label="Toggle theme">
+            <span id="theme-icon">🌙</span>
+        </button>
+
+        <!-- Language toggle -->
+        <button id="lang-btn" onclick="toggleLang()"
+            class="text-xs font-bold border border-gray-700 bg-gray-800 hover:bg-gray-700 px-2.5 py-1.5 rounded-lg transition-all"
+            aria-label="Toggle language">
+            <span id="lang-label">বাংলা</span>
+        </button>
+
+        <div id="live-badge"
+            class="flex items-center gap-2 text-xs font-semibold text-gray-400 bg-gray-800 border border-gray-700 px-3 py-1.5 rounded-full">
+            <span class="w-2 h-2 rounded-full bg-gray-500"></span>Connecting…
+        </div>
+    </nav>
+
+    <main class="pt-20 pb-16 px-4 md:px-6 max-w-6xl mx-auto">
+        <div class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-black mb-1" data-i18n="pageTitle">My Crop Insurance</h1>
+            <p class="text-gray-400 text-sm" data-i18n="pageDesc">Register crops, pay premiums, and monitor your
+                coverage on Polygon
+                blockchain.</p>
+        </div>
+
+        <div class="flex gap-1 bg-gray-900 border border-gray-800 rounded-xl p-1 mb-6 overflow-x-auto">
+            <button class="tab-btn active flex-1 min-w-max py-2 px-4 rounded-lg text-sm font-semibold transition-all"
+                onclick="switchTab('policies')" data-i18n="tabPolicies">My Policies</button>
+            <button
+                class="tab-btn flex-1 min-w-max py-2 px-4 rounded-lg text-sm font-semibold transition-all text-gray-400"
+                onclick="switchTab('register')" data-i18n="tabRegister">➕ New Policy</button>
+            <button
+                class="tab-btn flex-1 min-w-max py-2 px-4 rounded-lg text-sm font-semibold transition-all text-gray-400"
+                onclick="switchTab('weather')" data-i18n="tabWeather">🌤 Weather</button>
+            <button
+                class="tab-btn flex-1 min-w-max py-2 px-4 rounded-lg text-sm font-semibold transition-all text-gray-400"
+                id="payout-tab-btn" onclick="switchTab('payouts')" data-i18n="tabPayouts">⚡ Payouts</button>
+        </div>
+
+        <!-- TAB: POLICIES -->
+        <div id="tab-policies" class="slide-up">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-lg" data-i18n="regFarmers">Registered Farmers</h2>
+                        <span id="farmer-count"
+                            class="text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2.5 py-1 rounded-full">0
+                            policies</span>
+                    </div>
+                    <div id="farmers-list">
+                        <div id="empty-state" class="text-center py-12">
+                            <div class="text-4xl mb-3">🌾</div>
+                            <div class="font-semibold text-gray-300 mb-1">No policies yet</div>
+                            <div class="text-sm text-gray-500 mb-4">Register your first crop to get started</div>
+                            <button onclick="switchTab('register')"
+                                class="bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold px-5 py-2 rounded-xl text-sm transition-colors">Register
+                                Now →</button>
+                        </div>
+                    </div>
+                    <div id="farmer-detail"
+                        class="hidden bg-gray-900 border border-emerald-500/30 rounded-2xl p-5 mt-4 slide-up">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 id="fd-name" class="font-bold text-lg">—</h3>
+                            <span id="fd-chip" class="text-xs font-bold px-3 py-1 rounded-full">Active</span>
+                        </div>
+                        <div id="fd-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <div class="bg-gray-900 border border-emerald-500/30 rounded-2xl p-5">
+                        <div class="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2"
+                            data-i18n="poolLabel">Pool Balance
+                        </div>
+                        <div id="pool-amt" class="text-3xl font-black text-emerald-400 mb-1">৳0</div>
+                        <div class="text-xs text-gray-500 mb-3" data-i18n="poolSub">Total premiums locked in smart
+                            contract</div>
+                        <div class="bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                            <div id="pool-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-700"
+                                style="width:0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-600 mt-1"><span>৳0</span><span>৳200,000
+                                target</span></div>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-3 text-sm">
+                        <div class="flex justify-between"><span class="text-gray-400" data-i18n="covLabel">Total
+                                Coverage</span><span id="sum-cov" class="font-bold">৳0</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400" data-i18n="polLabel">Active
+                                Policies</span><span id="sum-pol" class="font-bold">0</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400" data-i18n="poutLabel">Payouts
+                                Made</span><span id="sum-pout" class="font-bold">0</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400"
+                                data-i18n="netLabel">Network</span><span class="font-bold text-emerald-400">Polygon
+                                Amoy</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: REGISTER -->
+        <div id="tab-register" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+                <div class="lg:col-span-3 bg-gray-900 border border-gray-800 rounded-2xl p-5 md:p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <div>
+                            <h2 class="font-bold text-lg" data-i18n="formTitle">New Insurance Policy</h2>
+                            <p class="text-sm text-gray-400 mt-0.5" data-i18n="formDesc">All fields pre-filled for demo
+                                — just click Submit.
+                            </p>
+                        </div>
+                        <span
+                            class="text-xs font-semibold text-blue-400 bg-blue-400/10 border border-blue-400/20 px-2.5 py-1 rounded-full">UC1
+                            · UC2</span>
+                    </div>
+                    <div
+                        class="flex items-start gap-2.5 bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-3 mb-5 text-sm">
+                        <span class="text-emerald-400 mt-0.5">💡</span>
+                        <span class="text-emerald-300">Form is pre-filled. Click <strong>"Register &amp; Pay
+                                Premium"</strong> to submit and see the blockchain transaction.</span>
+                    </div>
+                    <form id="reg-form" class="space-y-4" novalidate>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                                    data-i18n="fName">Full
+                                    Name *</label>
+                                <input id="r-name"
+                                    class="w-full bg-gray-800 border border-gray-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all"
+                                    type="text" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                                    data-i18n="fWallet">bKash
+                                    Number *</label>
+                                <input id="r-wallet"
+                                    class="w-full bg-gray-800 border border-gray-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all"
+                                    type="tel" maxlength="11" />
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                                    data-i18n="fCrop">Crop
+                                    Type *</label>
+                                <select id="r-crop"
+                                    class="w-full bg-gray-800 border border-gray-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all">
+                                    <option value="">— Select —</option>
+                                    <option value="Boro Rice">Boro Rice</option>
+                                    <option value="Aman Rice">Aman Rice</option>
+                                    <option value="Mustard">Mustard</option>
+                                    <option value="Jute">Jute</option>
+                                    <option value="Wheat">Wheat</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                                    data-i18n="fArea">Land Area *</label>
+                                <div class="flex gap-2">
+                                    <input id="r-area"
+                                        class="flex-1 min-w-0 bg-gray-800 border border-gray-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all"
+                                        type="number" min="0.01" max="99999" step="0.01" placeholder="e.g. 4.5" />
+                                    <select id="r-unit"
+                                        class="bg-gray-800 border border-gray-700 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none transition-all flex-shrink-0">
+                                        <option value="sqft">Square Feet</option>
+                                        <option value="katha">Katha</option>
+                                        <option value="bigha" selected>Bigha</option>
+                                        <option value="acre">Acre</option>
+                                        <option value="kani">Kani</option>
+                                        <option value="shotok">Shotok</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">GPS
+                                    Latitude</label>
+                                <input id="r-lat"
+                                    class="w-full bg-gray-800 border border-gray-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all"
+                                    type="number" step="0.0001" />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">GPS
+                                    Longitude</label>
+                                <input id="r-lon"
+                                    class="w-full bg-gray-800 border border-gray-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all"
+                                    type="number" step="0.0001" />
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                                    data-i18n="fDate">Planting
+                                    Date *</label>
+                                <input id="r-date"
+                                    class="w-full bg-gray-800 border border-gray-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all"
+                                    type="date" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                                    data-i18n="fTier">Coverage
+                                    Tier *</label>
+                                <select id="r-tier" onchange="updatePreview()"
+                                    class="w-full bg-gray-800 border border-gray-700 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all">
+                                    <option value="basic">Basic — ৳25,000 (৳800/season)</option>
+                                    <option value="standard" selected>Standard — ৳50,000 (৳1,500/season)</option>
+                                    <option value="premium">Premium — ৳100,000 (৳2,800/season)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-4 text-sm">
+                            <div class="font-semibold text-gray-300 mb-2" data-i18n="summTitle">Policy Summary</div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between"><span class="text-gray-400"
+                                        data-i18n="summCov">Coverage
+                                        Amount</span><span id="prev-cov"
+                                        class="font-bold text-emerald-400">৳50,000</span></div>
+                                <div class="flex justify-between"><span class="text-gray-400"
+                                        data-i18n="summPrem">Premium
+                                        (one-time)</span><span id="prev-prem" class="font-bold">৳1,500</span></div>
+                                <div class="flex justify-between"><span class="text-gray-400"
+                                        data-i18n="summPay">Payment Method</span><span
+                                        class="font-bold text-pink-400">📱 bKash</span></div>
+                                <div class="flex justify-between"><span class="text-gray-400"
+                                        data-i18n="summSet">Settlement</span><span class="font-bold text-emerald-400">⚡
+                                        Instant (on-chain)</span></div>
+                            </div>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-gray-950 font-black py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                            <span data-i18n="submitBtn">Register &amp; Pay Premium on Blockchain</span>
+                        </button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div id="tx-card"
+                        class="hidden bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-5 slide-up">
+                        <div class="text-center mb-4">
+                            <div
+                                class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-xl text-gray-950 font-black mx-auto mb-3 pop-in">
+                                ✓</div>
+                            <h3 class="font-bold text-base text-emerald-400">Registered on Blockchain!</h3>
+                            <p class="text-xs text-gray-400 mt-1">Written to FarmerRegistry.sol · Saved to
+                                demoDatabase.json</p>
+                        </div>
+                        <div id="tx-rows" class="bg-gray-900/60 rounded-xl p-3 font-mono text-xs space-y-1.5"></div>
+                        <button onclick="switchTab('policies')"
+                            class="w-full mt-3 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 font-semibold py-2 rounded-xl text-xs transition-colors">View
+                            My Policies →</button>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                        <h3 class="font-bold mb-4" data-i18n="howTitle">How it works</h3>
+                        <div class="space-y-4">
+                            <div class="flex gap-3">
+                                <div
+                                    class="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-400 flex-shrink-0 mt-0.5">
+                                    1</div>
+                                <div>
+                                    <span class="font-semibold text-sm" data-i18n="how1">Register &amp; pay</span>
+                                    <div class="text-xs text-gray-400 mt-0.5" data-i18n="how1d">Crop details written to
+                                        FarmerRegistry.sol
+                                        · Premium locked in pool</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <div
+                                    class="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-400 flex-shrink-0 mt-0.5">
+                                    2</div>
+                                <div>
+                                    <span class="font-semibold text-sm" data-i18n="how2">Oracle monitors 24/7</span>
+                                    <div class="text-xs text-gray-400 mt-0.5" data-i18n="how2d">Weather + satellite NDVI
+                                        + river level
+                                        checked every 6 hours</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <div
+                                    class="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-400 flex-shrink-0 mt-0.5">
+                                    3</div>
+                                <div>
+                                    <span class="font-semibold text-sm" data-i18n="how3">Flood detected → payout</span>
+                                    <div class="text-xs text-gray-400 mt-0.5" data-i18n="how3d">Coverage sent to your
+                                        bKash within 72h ·
+                                        Zero claim forms</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: WEATHER -->
+        <div id="tab-weather" class="hidden">
+            <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 dot-pulse"></span>
+                    <span class="font-semibold" data-i18n="location">Sunamganj, Sylhet</span>
+                    <span class="text-sm text-gray-400">25.07°N, 91.00°E</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="w-time" class="text-xs text-gray-500">—</span>
+                    <button id="refresh-weather"
+                        class="flex items-center gap-1.5 text-xs bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 px-3 py-1.5 rounded-lg font-medium transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg><span data-i18n="refreshBtn">Refresh</span>
+                    </button>
+                </div>
+            </div>
+            <div id="weather-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4"></div>
+            <div class="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4 text-sm text-blue-200">
+                <strong class="text-white">Data sources:</strong> Rainfall from <a href="https://open-meteo.com"
+                    target="_blank" class="underline text-blue-400">Open-Meteo</a> (live). NDVI from simulated
+                Sentinel-2. River level from simulated FFWC (Surma, SUR-07, Sunamganj).
+            </div>
+        </div>
+
+        <!-- TAB: PAYOUTS -->
+        <div id="tab-payouts" class="hidden">
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-bold text-lg" data-i18n="poutTitle">Payout History</h2>
+                    <span id="pout-count"
+                        class="text-xs font-semibold text-gray-400 bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full">0
+                        payouts</span>
+                </div>
+                <div id="pout-list">
+                    <div class="text-center py-12">
+                        <div class="text-4xl mb-3">⚡</div>
+                        <div class="font-semibold text-gray-300 mb-1">No payouts yet</div>
+                        <div class="text-sm text-gray-500">Go to the Oracle Engine portal and simulate a flash flood to
+                            trigger payouts.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="fp-toast"></div>
+    <script src="shared.js"></script>
+    <script>
+        const TIERS = { basic: { coverage: 25000, premium: 800 }, standard: { coverage: 50000, premium: 1500 }, premium: { coverage: 100000, premium: 2800 } };
+        const TAB_IDS = ['policies', 'register', 'weather', 'payouts'];
+
+        function switchTab(id) {
+            TAB_IDS.forEach((t, i) => {
+                const el = document.getElementById('tab-' + t);
+                const btn = document.querySelectorAll('.tab-btn')[i];
+                if (t === id) {
+                    el.classList.remove('hidden'); el.classList.add('slide-up');
+                    btn.classList.add('active', 'bg-gray-800', 'text-white'); btn.classList.remove('text-gray-400');
+                } else {
+                    el.classList.add('hidden'); el.classList.remove('slide-up');
+                    btn.classList.remove('active', 'bg-gray-800', 'text-white'); btn.classList.add('text-gray-400');
+                }
+            });
+            if (id === 'weather') loadWeather();
+            if (id === 'payouts') renderPayouts();
+            if (id === 'policies') renderPolicies();
+        }
+
+        /* ── Policies ── */
+        function renderPolicies() {
+            const farmers = AppState.farmers;
+            document.getElementById('farmer-count').textContent = farmers.length + ' policies';
+
+            const oldPool = parseInt(document.getElementById('pool-amt').textContent.replace(/[^\d]/g, '')) || 0;
+            const newPool = AppState.poolBalance;
+            if (oldPool !== newPool) {
+                UI.animateCounter(document.getElementById('pool-amt'), oldPool, newPool, 700);
+            } else {
+                document.getElementById('pool-amt').textContent = '৳' + newPool.toLocaleString();
+            }
+
+            document.getElementById('pool-bar').style.width = Math.min(newPool / 2000, 100) + '%';
+            document.getElementById('sum-cov').textContent = '৳' + AppState.totalCoverage.toLocaleString();
+            document.getElementById('sum-pol').textContent = farmers.length;
+            document.getElementById('sum-pout').textContent = AppState.payoutCount;
+
+            const empty = document.getElementById('empty-state');
+            const list = document.getElementById('farmers-list');
+            if (!farmers.length) {
+                list.innerHTML = ''; list.appendChild(empty); empty.classList.remove('hidden'); return;
+            }
+            empty.classList.add('hidden');
+            list.innerHTML = farmers.map(f => `
+    <div onclick="showDetail(${f.id})" class="flex items-center gap-3 p-3.5 rounded-xl border ${f.paid ? 'border-blue-500/30 bg-blue-500/5' : 'border-gray-800 hover:border-emerald-500/40 hover:bg-gray-800/40'} cursor-pointer transition-all mb-2 slide-up">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center font-black text-gray-950 text-base flex-shrink-0">${f.name.charAt(0)}</div>
+      <div class="flex-1 min-w-0">
+        <div class="font-semibold text-sm truncate">${f.name}</div>
+        <div class="text-xs text-gray-400 truncate">${f.crop} · ${f.area} ${f.unit || 'Bigha'} · ${f.tier} tier</div>
+      </div>
+      <div class="text-right flex-shrink-0">
+        <div class="text-xs font-bold ${f.paid ? 'text-blue-400' : 'text-emerald-400'}">${f.paid ? '⚡ Paid' : '✓ Active'}</div>
+        <div class="text-xs text-gray-400 mt-0.5">৳${f.coverage.toLocaleString()}</div>
+      </div>
+    </div>`).join('');
+        }
+
+        function showDetail(id) {
+            const f = AppState.farmers.find(x => x.id === id);
+            if (!f) return;
+            const card = document.getElementById('farmer-detail');
+            card.classList.remove('hidden');
+            document.getElementById('fd-name').textContent = f.name;
+            const chip = document.getElementById('fd-chip');
+            chip.className = `text-xs font-bold px-3 py-1 rounded-full ${f.paid ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`;
+            chip.textContent = f.paid ? '⚡ Payout Executed' : '✓ Active Coverage';
+            document.getElementById('fd-grid').innerHTML = [
+                ['Crop', f.crop], ['Land', f.area + ' ' + (f.unit || 'Bigha')], ['Coverage', '৳' + f.coverage.toLocaleString()],
+                ['Premium', '৳' + f.premium.toLocaleString()], ['Planted', f.planted], ['bKash', f.wallet],
+                ['GPS', f.lat + '°N, ' + f.lon + '°E'], ['Registered', UI.formatDate(f.registeredAt)],
+                ...(f.paid && f.payoutTx ? [['Payout TxHash', f.payoutTx.slice(0, 12) + '…']] : [])
+            ].map(([k, v]) => `<div class="bg-gray-800/60 rounded-xl p-3"><div class="text-xs text-gray-500 mb-1">${k}</div><div class="text-sm font-semibold break-all">${v}</div></div>`).join('');
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        /* ── Register form ── */
+        function prefill() {
+            document.getElementById('r-name').value = 'Md. Abdul Karim';
+            document.getElementById('r-wallet').value = '01712345678';
+            document.getElementById('r-crop').value = 'Boro Rice';
+            document.getElementById('r-area').value = '4.5';
+            document.getElementById('r-unit').value = 'bigha';
+            document.getElementById('r-lat').value = '25.0700';
+            document.getElementById('r-lon').value = '91.0000';
+            document.getElementById('r-date').value = '2025-12-10';
+            document.getElementById('r-tier').value = 'standard';
+            updatePreview();
+        }
+        function updatePreview() {
+            const t = TIERS[document.getElementById('r-tier').value] || TIERS.standard;
+            document.getElementById('prev-cov').textContent = '৳' + t.coverage.toLocaleString();
+            document.getElementById('prev-prem').textContent = '৳' + t.premium.toLocaleString();
+        }
+
+        document.getElementById('reg-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const name = document.getElementById('r-name').value.trim();
+            const wallet = document.getElementById('r-wallet').value.trim();
+            const crop = document.getElementById('r-crop').value;
+            const area = parseFloat(document.getElementById('r-area').value);
+            const unitKey = document.getElementById('r-unit').value;
+            const UNIT_LABELS = { sqft: 'Square Feet', katha: 'Katha', bigha: 'Bigha', acre: 'Acre', kani: 'Kani', shotok: 'Shotok' };
+            const unitLabel = UNIT_LABELS[unitKey] || unitKey;
+            // Convert to Bigha equivalent for storage reference
+            const TO_BIGHA = { sqft: 1 / 43560 * 2.47 * 3, katha: 0.0667, bigha: 1, acre: 3, kani: 0.5, shotok: 0.033 };
+            const areaBigha = +(area * (TO_BIGHA[unitKey] || 1)).toFixed(3);
+            const lat = parseFloat(document.getElementById('r-lat').value);
+            const lon = parseFloat(document.getElementById('r-lon').value);
+            const date = document.getElementById('r-date').value;
+            const tier = document.getElementById('r-tier').value;
+            if (!name || !wallet || !crop || isNaN(area) || !date) { UI.showToast('Please fill all required fields', 'error'); return; }
+            const t = TIERS[tier] || TIERS.standard;
+            const farmer = {
+                id: Date.now(), name, wallet, crop,
+                area, unit: unitLabel, areaBigha,
+                lat, lon, planted: date, tier, coverage: t.coverage, premium: t.premium, address: Blockchain.randomHex(40), registeredAt: new Date(), paid: false
+            };
+            AppState.farmers.push(farmer);
+            AppState.poolBalance += t.premium;
+            AppState.totalCoverage += t.coverage;
+            const entry = Blockchain.addEntry('registration', name, `Registered ${crop} · ${area} ${unitLabel} (${areaBigha} Bigha) · GPS(${lat.toFixed(4)},${lon.toFixed(4)})`);
+            Blockchain.addEntry('premium', name, `Premium paid ৳${t.premium.toLocaleString()} · Locked in contract pool`);
+            // Explicit save + broadcast to all tabs
+            AppState.save('registration', { name, crop });
+
+            document.getElementById('tx-card').classList.remove('hidden');
+            document.getElementById('tx-rows').innerHTML = [
+                ['Status', '✓ Confirmed on Polygon'], ['Block', '#' + entry.block.toLocaleString()],
+                ['Farmer', name], ['Crop', crop + ' · ' + area + ' ' + unitLabel],
+                ['Coverage', '৳' + t.coverage.toLocaleString()], ['Premium', '৳' + t.premium.toLocaleString()],
+                ['TxHash', entry.txHash.slice(0, 16) + '…'],
+            ].map(([k, v]) => `<div class="flex justify-between gap-2"><span class="text-gray-500">${k}</span><span class="text-emerald-400 text-right break-all">${v}</span></div>`).join('');
+            renderPolicies();
+            UI.showToast('✅ ' + name + ' registered on Polygon! Saved to demoDatabase.json', 'success');
+
+            // Prefill next demo farmer
+            setTimeout(() => {
+                document.getElementById('r-name').value = 'Rina Begum';
+                document.getElementById('r-wallet').value = '01812345679';
+                document.getElementById('r-crop').value = 'Mustard';
+                document.getElementById('r-area').value = '2.5';
+                document.getElementById('r-unit').value = 'katha';
+                document.getElementById('r-tier').value = 'basic';
+                updatePreview();
+            }, 200);
+        });
+
+        /* ── Weather ── */
+        function buildWCard(icon, label, val, unit, thresh, pct, status, cls) {
+            const bgs = { ok: 'border-gray-700', warn: 'border-amber-500/40', alert: 'border-red-500/50' };
+            const colors = { ok: 'text-white', warn: 'text-amber-400', alert: 'text-red-400' };
+            const bar = { ok: 'bg-emerald-500', warn: 'bg-amber-500', alert: 'bg-red-500' };
+            return `<div class="bg-gray-900 border ${bgs[cls]} rounded-2xl p-4 transition-all">
+    <div class="text-xl mb-1">${icon}</div>
+    <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">${label}</div>
+    <div class="text-2xl font-black ${colors[cls]} mb-0.5">${val}<span class="text-sm font-normal text-gray-500 ml-1">${unit}</span></div>
+    <div class="text-xs text-gray-600 mb-2">${thresh}</div>
+    <div class="bg-gray-700 rounded-full h-1 overflow-hidden mb-1.5"><div class="${bar[cls]} h-full rounded-full" style="width:${pct}%"></div></div>
+    <div class="text-xs font-semibold ${colors[cls]}">${status}</div>
+  </div>`;
+        }
+
+        async function loadWeather() {
+            document.getElementById('weather-grid').innerHTML = Array(6).fill('<div class="bg-gray-900 border border-gray-700 rounded-2xl p-4 animate-pulse"><div class="h-24 bg-gray-800 rounded-xl"></div></div>').join('');
+            const d = await WeatherService.fetch();
+            const o = OracleEngine.simulate(AppState.floodSimulated);
+            const t = AppState.thresholds;
+            document.getElementById('w-time').textContent = (d.source === 'Fallback' ? '⚠ Offline — ' : '✓ Live · ') + UI.formatTime(d.fetchedAt);
+            document.getElementById('weather-grid').innerHTML = [
+                buildWCard('🌧️', '72h Rainfall', o.rainfall.toFixed(1), 'mm', `Trigger > ${t.rainfall}mm`, Math.min((o.rainfall / t.rainfall) * 100, 100), o.rainfall > t.rainfall ? '⚠ Threshold exceeded!' : o.rainfall > t.rainfall * .75 ? '⬆ Approaching limit' : '✓ Normal', o.rainfall > t.rainfall ? 'alert' : o.rainfall > t.rainfall * .75 ? 'warn' : 'ok'),
+                buildWCard('🛰️', 'NDVI Drop', o.ndvi.toFixed(1), '%', `Trigger > ${t.ndvi}%`, Math.min((o.ndvi / t.ndvi) * 100, 100), o.ndvi > t.ndvi ? '⚠ Threshold exceeded!' : '✓ Healthy crops', o.ndvi > t.ndvi ? 'alert' : 'ok'),
+                buildWCard('🌊', 'River Level', o.river.toFixed(2), 'm', `Danger > ${t.river}m`, Math.min((o.river / t.river) * 100, 100), o.river > t.river ? '⚠ Above danger mark!' : o.river > t.river * .85 ? '⬆ Rising fast' : '✓ Below danger mark', o.river > t.river ? 'alert' : o.river > t.river * .85 ? 'warn' : 'ok'),
+                buildWCard('🌡️', 'Temperature', d.temp.toFixed(1), '°C', 'Reference only', Math.min((d.temp / 40) * 100, 100), '✓ Normal', 'ok'),
+                buildWCard('💧', 'Humidity', d.humidity + '', '%', 'Reference only', d.humidity, '✓ Normal', 'ok'),
+                buildWCard('🌬️', 'Wind Speed', d.wind.toFixed(1), 'km/h', 'Reference only', Math.min((d.wind / 60) * 100, 100), '✓ Normal', 'ok'),
+            ].join('');
+        }
+
+        /* ── Payouts ── */
+        function renderPayouts() {
+            const pouts = AppState.ledger.filter(e => e.type === 'payout');
+            document.getElementById('pout-count').textContent = pouts.length + ' payouts';
+            document.getElementById('pout-list').innerHTML = pouts.length ? pouts.map(p => `
+    <div class="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 mb-3 slide-up">
+      <div class="text-2xl">⚡</div>
+      <div class="flex-1"><div class="font-bold text-emerald-400">৳${(p.amount || 50000).toLocaleString()}</div><div class="text-xs text-gray-400 mt-0.5">${p.data}</div></div>
+      <div class="text-right text-xs text-gray-400">${UI.formatDate(p.timestamp)}<br/>${UI.formatTime(p.timestamp)}</div>
+    </div>`).join('')
+                : '<div class="text-center py-12"><div class="text-4xl mb-3">⚡</div><div class="font-semibold text-gray-300 mb-1">No payouts yet</div><div class="text-sm text-gray-500">Go to the Oracle Engine portal and simulate a flash flood.</div></div>';
+        }
+
+        /* ── SSE live update listeners ── */
+        function onPayout(payload) {
+            // Animate pool balance down
+            const poolEl = document.getElementById('pool-amt');
+            const oldV = parseInt(poolEl.textContent.replace(/[^\d]/g, '')) || 0;
+            UI.animateCounter(poolEl, oldV, AppState.poolBalance, 1200);
+
+            // Pool bar turns red briefly
+            const bar = document.getElementById('pool-bar');
+            bar.classList.add('bg-red-500'); bar.style.width = Math.min(AppState.poolBalance / 2000, 100) + '%';
+            setTimeout(() => bar.classList.remove('bg-red-500'), 2500);
+
+            // Animate payouts count up
+            const pEl = document.getElementById('sum-pout');
+            UI.animateCounter(pEl, parseInt(pEl.textContent) || 0, AppState.payoutCount, 800, '');
+
+            // Flash payout tab badge
+            const pTab = document.getElementById('payout-tab-btn');
+            if (pTab) {
+                pTab.classList.add('text-emerald-400');
+                pTab.innerHTML = `⚡ Payouts <span class="inline-flex items-center justify-center w-4 h-4 text-xs bg-emerald-500 text-gray-950 rounded-full font-black ml-1 pop-in">${AppState.payoutCount}</span>`;
+                setTimeout(() => { pTab.innerHTML = '⚡ Payouts'; pTab.classList.remove('text-emerald-400'); }, 8000);
+            }
+
+            // Re-render farmer cards with ⚡ Paid badges after short delay
+            setTimeout(() => {
+                renderPolicies();
+                document.querySelectorAll('#farmers-list > div').forEach((card, i) => {
+                    setTimeout(() => {
+                        card.style.transform = 'scale(1.02)';
+                        setTimeout(() => { card.style.transform = ''; }, 600);
+                    }, i * 100);
+                });
+            }, 400);
+
+            // If payout tab is open, refresh it
+            if (!document.getElementById('tab-payouts').classList.contains('hidden')) renderPayouts();
+
+            UI.showToast(`⚡ Payout executed! ৳${(payload.total || 0).toLocaleString()} sent to ${AppState.payoutCount} farmers`, 'success', 6000);
+        }
+
+        /* ── Init (async) ── */
+        (async () => {
+            await AppState.init();
+            const badge = document.getElementById('live-badge');
+            badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 dot-pulse"></span>' + (currentLang === 'bn' ? 'লাইভ · কৃষক পোর্টাল' : 'Live · Farmer Portal');
+            badge.className = 'flex items-center gap-2 text-xs font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-3 py-1.5 rounded-full';
+            StateEvents.on('payout', onPayout);
+            StateEvents.on('registration', () => renderPolicies());
+            StateEvents.on('update', () => renderPolicies());
+            StateEvents.on('reset', () => {
+                renderPolicies();
+                if (!document.getElementById('tab-payouts').classList.contains('hidden')) renderPayouts();
+                UI.showToast(T('resetNotice'), 'info');
+            });
+            renderPolicies();
+            prefill();
+            document.getElementById('refresh-weather').addEventListener('click', () => { WeatherService.cache = null; loadWeather(); });
+            applyLang(currentLang);
+            applyTheme(currentTheme);
+        })();
+
+        /* ════════ THEME ══ */
+        let currentTheme = localStorage.getItem('fp_theme') || 'dark';
+        function applyTheme(t) {
+            currentTheme = t;
+            const root = document.getElementById('root');
+            const icon = document.getElementById('theme-icon');
+            if (t === 'light') {
+                root.classList.add('light'); root.classList.remove('dark');
+                icon.textContent = '☀️';
+            } else {
+                root.classList.remove('light'); root.classList.add('dark');
+                icon.textContent = '🌙';
+            }
+            localStorage.setItem('fp_theme', t);
+        }
+        function toggleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+
+        /* ════════ TRANSLATIONS ══ */
+        let currentLang = localStorage.getItem('fp_lang') || 'en';
+        const STRINGS = {
+            en: {
+                back: 'Back', pageTitle: 'My Crop Insurance', pageDesc: 'Register crops, pay premiums, and monitor your coverage on Polygon blockchain.',
+                tabPolicies: 'My Policies', tabRegister: '➕ New Policy', tabWeather: '🌤 Weather', tabPayouts: '⚡ Payouts',
+                regFarmers: 'Registered Farmers', emptyTitle: 'No policies yet', emptyDesc: 'Register your first crop to get started', emptyBtn: 'Register Now →',
+                poolLabel: 'Pool Balance', poolSub: 'Total premiums locked in smart contract', covLabel: 'Total Coverage',
+                polLabel: 'Active Policies', poutLabel: 'Payouts Made', netLabel: 'Network',
+                formTitle: 'New Insurance Policy', formDesc: 'All fields pre-filled for demo — just click Submit.',
+                formHint: 'Form is pre-filled. Click', formHintBold: '"Register & Pay Premium"', formHintSuffix: 'to submit and see the blockchain transaction.',
+                fName: 'Full Name', fWallet: 'bKash Number', fCrop: 'Crop Type', fArea: 'Land Area',
+                fLat: 'GPS Latitude', fLon: 'GPS Longitude', fDate: 'Planting Date', fTier: 'Coverage Tier',
+                summTitle: 'Policy Summary', summCov: 'Coverage Amount', summPrem: 'Premium (one-time)', summPay: 'Payment Method', summSet: 'Settlement',
+                submitBtn: 'Register & Pay Premium on Blockchain',
+                regSuccess: 'Registered on Blockchain!', regSubSuccess: 'Written to FarmerRegistry.sol · Saved to demoDatabase.json', viewPolicies: 'View My Policies →',
+                howTitle: 'How it works', how1: 'Register & pay', how1d: 'Crop details written to FarmerRegistry.sol · Premium locked in pool',
+                how2: 'Oracle monitors 24/7', how2d: 'Weather + satellite NDVI + river level checked every 6 hours',
+                how3: 'Flood detected → payout', how3d: 'Coverage sent to your bKash within 72h · Zero claim forms',
+                location: 'Sunamganj, Sylhet', refreshBtn: 'Refresh', dataSrc: 'Data sources:',
+                poutTitle: 'Payout History', noPoutTitle: 'No payouts yet', noPoutDesc: 'Go to the Oracle Engine portal and simulate a flash flood to trigger payouts.',
+                paid: '⚡ Paid', active: '✓ Active', policies: 'policies', payouts: 'payouts',
+                resetNotice: '🔄 System state was reset by Admin', cropSelect: '— Select —',
+                tierBasic: 'Basic — ৳25,000 (৳800/season)', tierStd: 'Standard — ৳50,000 (৳1,500/season)', tierPrem: 'Premium — ৳100,000 (৳2,800/season)',
+            },
+            bn: {
+                back: 'ফিরে যান', pageTitle: 'আমার ফসল বীমা', pageDesc: 'ফসল নিবন্ধন করুন, প্রিমিয়াম পরিশোধ করুন এবং পলিগন ব্লকচেইনে আপনার কভারেজ পর্যবেক্ষণ করুন।',
+                tabPolicies: 'আমার পলিসি', tabRegister: '➕ নতুন পলিসি', tabWeather: '🌤 আবহাওয়া', tabPayouts: '⚡ পেমেন্ট',
+                regFarmers: 'নিবন্ধিত কৃষক', emptyTitle: 'এখনো কোনো পলিসি নেই', emptyDesc: 'শুরু করতে প্রথম ফসল নিবন্ধন করুন', emptyBtn: 'এখনী নিবন্ধন করুন →',
+                poolLabel: 'পুল ব্যালেন্স', poolSub: 'স্মার্ট কন্ট্রাক্টে সংরক্ষিত মোট প্রিমিয়াম', covLabel: 'মোট কভারেজ',
+                polLabel: 'সক্রিয় পলিসি', poutLabel: 'পেমেন্ট বিতরণ', netLabel: 'নেটওয়ার্ক',
+                formTitle: 'নতুন বীমা পলিসি', formDesc: 'সকল তথ্য ডেমোর জন্য পূর্ব-পূরণ করা — শুধু সাবমিট ক্লিক করুন।',
+                formHint: 'ফর্ম পূর্ব-পূরণ করা। ক্লিক করুন', formHintBold: '" নিবন্ধন ও প্রিমিয়াম পরিশোধ"', formHintSuffix: 'ব্লকচেইন লেনদেন দেখতে।',
+                fName: 'পূর্ণ নাম', fWallet: 'বিকাশ নম্বর', fCrop: 'ফসলের ধরন', fArea: 'জমির পরিমাণ',
+                fLat: 'জিপিএস অক্ষাংশ', fLon: 'জিপিএস দ্রাঘিমাংশ', fDate: 'রোপণের তারিখ', fTier: 'কভারেজ স্তর',
+                summTitle: 'পলিসি সারসংক্ষেপ', summCov: 'কভারেজ পরিমাণ', summPrem: 'প্রিমিয়াম (একবার)', summPay: 'পেমেন্ট পদ্ধতি', summSet: 'নিষ্পত্তি',
+                submitBtn: 'ব্লকচেইনে নিবন্ধন ও প্রিমিয়াম পরিশোধ করুন',
+                regSuccess: 'ব্লকচেইনে নিবন্ধন সম্পন্ন!', regSubSuccess: 'FarmerRegistry.sol তে লেখা হয়েছে · demoDatabase.json সর্নিবন্ধিত', viewPolicies: 'আমার পলিসি দেখুন →',
+                howTitle: 'এটি কীভাবে কাজ করে', how1: 'নিবন্ধন ও পরিশোধ', how1d: 'ফসলের তথ্য FarmerRegistry.sol তে লেখা · প্রিমিয়াম পুলে সর্নিবন্ধ',
+                how2: 'ওরাকল ২৪/৭ পর্যবেক্ষণ করে', how2d: 'আবহাওয়া + ধানি NDVI + নদীর মাত্রা প্রতি ৬ ঘণ্টায় পরীক্ষা',
+                how3: 'বন্যা শনাক্ত → পেমেন্ট', how3d: '৭২ ঘন্টার মধ্যে আপনার বিকাশে পাঠানো হবে · কোনো দাবি ফর্ম লাগবে না',
+                location: 'সুনামগঞ্জ, সিলেট', refreshBtn: 'রিফ্রেশ', dataSrc: 'তথ্য উৎস:',
+                poutTitle: 'পেমেন্টের ইতিহাস', noPoutTitle: 'এখনো কোনো পেমেন্ট নেই', noPoutDesc: 'বন্যা ট্রিগার করতে ওরাকল ইঞ্জিন পোর্টালে যান।',
+                paid: '⚡ পরিশোধিত', active: '✓ সক্রিয়', policies: 'টি পলিসি', payouts: 'টি পেমেন্ট',
+                resetNotice: '🔄 অ্যাডমিন সিস্টেম রিসেট করেছেন', cropSelect: '— বেছুন —',
+                tierBasic: 'বেসিক — ৳25,000 (৳800/সিজন)', tierStd: 'স্ট্যান্ডার্ড — ৳50,000 (৳1,500/সিজন)', tierPrem: 'প্রিমিয়াম — ৳100,000 (৳2,800/সিজন)',
+            }
+        };
+        function T(k) { return (STRINGS[currentLang] || STRINGS.en)[k] || k; }
+
+        function applyLang(lang) {
+            currentLang = lang;
+            document.getElementById('lang-label').textContent = lang === 'en' ? 'বাংলা' : 'EN';
+            document.documentElement.lang = lang === 'bn' ? 'bn' : 'en';
+            localStorage.setItem('fp_lang', lang);
+            // Static i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.dataset.i18n;
+                if (el.tagName === 'INPUT' || el.tagName === 'SELECT') el.placeholder = T(k);
+                else el.textContent = T(k);
+            });
+            // Dynamic select options
+            const crop = document.getElementById('r-crop');
+            if (crop) { crop.options[0].text = T('cropSelect'); }
+            const tier = document.getElementById('r-tier');
+            if (tier) { tier.options[0].text = T('tierBasic'); tier.options[1].text = T('tierStd'); tier.options[2].text = T('tierPrem'); }
+            // Re-render dynamic sections with translated strings
+            renderPolicies();
+            renderPayouts();
+        }
+        function toggleLang() { applyLang(currentLang === 'en' ? 'bn' : 'en'); }
+    </script>
+</body>
+
+</html>

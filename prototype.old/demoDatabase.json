@@ -1,0 +1,68 @@
+{
+  "farmers": [
+    {
+      "id": 1771692953382,
+      "name": "Md. Abdul Karim",
+      "wallet": "01712345678",
+      "crop": "Boro Rice",
+      "area": 4.5,
+      "lat": 25.07,
+      "lon": 91,
+      "planted": "2025-12-10",
+      "tier": "standard",
+      "coverage": 50000,
+      "premium": 1500,
+      "address": "0x189a4f05268244a56fc7ca38afe09ea510754ac1",
+      "registeredAt": "2026-02-21T16:55:53.382Z",
+      "paid": true,
+      "payoutTx": "0x909fc68dde5706a978c97da54e3ca29e197ff6048c2acdc18d3fde599e3aad77",
+      "payoutBlock": 19400011
+    }
+  ],
+  "ledger": [
+    {
+      "block": 19400011,
+      "timestamp": "2026-02-21T16:56:14.304Z",
+      "type": "payout",
+      "actor": "InsurancePool.sol",
+      "data": "Payout ৳50,000 → Md. Abdul Karim (01712345678)",
+      "txHash": "0x981e083055d04765221856a8ea53235099c69f8fba19284e039c291507047f48",
+      "amount": 50000
+    },
+    {
+      "block": 19400008,
+      "timestamp": "2026-02-21T16:56:09.221Z",
+      "type": "oracle",
+      "actor": "Oracle Engine",
+      "data": "FLOOD: RF=237.5mm NDVI=62.4% River=9.8m – All thresholds exceeded",
+      "txHash": "0x4f554a38630f581e6dd7a2670db422b40f8aea6aac69b0d0bbfadb69f9c98196"
+    },
+    {
+      "block": 19400005,
+      "timestamp": "2026-02-21T16:55:53.383Z",
+      "type": "premium",
+      "actor": "Md. Abdul Karim",
+      "data": "Premium paid ৳1,500 · Locked in contract pool",
+      "txHash": "0x9ef89bc438bd04bcb217e7ce5c91a2e749a97fadbbe7e441ba024dbe6d570db4"
+    },
+    {
+      "block": 19400002,
+      "timestamp": "2026-02-21T16:55:53.382Z",
+      "type": "registration",
+      "actor": "Md. Abdul Karim",
+      "data": "Registered Boro Rice · 4.5 bigha · GPS(25.0700,91.0000)",
+      "txHash": "0x2b24861719e79833f19adafba1f3c0edfbc3e04c42feb42d27d14febb8662804"
+    }
+  ],
+  "blockNumber": 19400012,
+  "poolBalance": 0,
+  "totalCoverage": 50000,
+  "payoutCount": 1,
+  "payoutTotal": 50000,
+  "thresholds": {
+    "rainfall": 200,
+    "ndvi": 40,
+    "river": 8.5
+  },
+  "floodSimulated": true
+}

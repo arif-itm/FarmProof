@@ -1,0 +1,175 @@
+/* ════════════════════════════════════════════
+   FarmProof — Tailwind config + custom styles
+   ════════════════════════════════════════════ */
+
+/* Page fade transition */
+body {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+body.visible {
+  opacity: 1;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+}
+
+/* Pulse animation for status dots */
+@keyframes pulse-dot {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.6);
+  }
+}
+
+.dot-pulse {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Blockchain canvas */
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Range slider custom */
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 3px solid #111827;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  transition: transform 0.15s;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Payout result animation */
+@keyframes pop-in {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pop-in {
+  animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slide-up 0.3s ease;
+}
+
+/* Step active spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 0.7s linear infinite;
+}
+
+/* Toast */
+#fp-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: #1f2937;
+  color: #f9fafb;
+  border: 1px solid #374151;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transform: translateY(60px);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s;
+  pointer-events: none;
+  max-width: 320px;
+}
+
+#fp-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#fp-toast.success {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10b981;
+}
+
+#fp-toast.error {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+#fp-toast.info {
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #3b82f6;
+}
+
+/* Monospace */
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Table row hover */
+tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
