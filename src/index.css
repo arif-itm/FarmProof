@@ -1,0 +1,240 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #030712;
+  min-height: 100%;
+}
+
+/* ── LIGHT MODE OVERRIDES (html.light class) ── */
+html.light,
+html.light body {
+  background: #f0f9ff !important;
+  color: #0f172a;
+}
+
+html.light nav {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light .bg-gray-900 {
+  background: #ffffff !important;
+}
+
+html.light .bg-gray-800 {
+  background: #f1f5f9 !important;
+}
+
+html.light .bg-gray-800\/60 {
+  background: #f8fafc !important;
+}
+
+html.light .bg-gray-900\/60 {
+  background: #ffffff !important;
+}
+
+html.light .bg-gray-950\/90 {
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-gray-300 {
+  color: #334155 !important;
+}
+
+html.light .text-gray-400 {
+  color: #475569 !important;
+}
+
+html.light .text-gray-500 {
+  color: #64748b !important;
+}
+
+html.light .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+html.light .border-gray-800 {
+  border-color: #e2e8f0 !important;
+}
+
+html.light .border-gray-700 {
+  border-color: #cbd5e1 !important;
+}
+
+html.light .bg-gray-700 {
+  background: #e2e8f0 !important;
+}
+
+html.light input,
+html.light select,
+html.light textarea {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light .tab-btn.active {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html.light .tab-btn {
+  color: #64748b !important;
+}
+
+html.light .font-mono {
+  color: #1e40af;
+}
+
+html.light .divide-gray-800>* {
+  border-color: #e2e8f0 !important;
+}
+
+/* Landing page light mode — nav uses bg-gray-950/80 and /90 variants */
+html.light .bg-gray-950\/80 {
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* Landing canvas opacity — mute dots slightly in light mode for contrast */
+html.light canvas {
+  opacity: 0.35;
+}
+
+/* Landing h1, tagline and body text in light mode */
+html.light h1 {
+  color: #0f172a !important;
+}
+
+html.light .italic {
+  color: #334155 !important;
+}
+
+/* Portal card hover bg in light mode */
+html.light .hover\:bg-gray-800:hover {
+  background: #f1f5f9 !important;
+}
+
+/* Stat/KPI text in light mode */
+html.light .bg-gray-900.border {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+}
+
+/* animate theme switch */
+body,
+nav,
+.bg-gray-900,
+.bg-gray-800,
+.text-white,
+.text-gray-400,
+.border-gray-800 {
+  transition: background .25s, color .25s, border-color .25s;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Dot pulse animation */
+@keyframes pulse-dot {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1)
+  }
+
+  50% {
+    opacity: .4;
+    transform: scale(.85)
+  }
+}
+
+.dot-pulse {
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+/* Slide up animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
+}
+
+.slide-up {
+  animation: slideUp .35s ease both;
+}
+
+/* Pop in */
+@keyframes popIn {
+  0% {
+    transform: scale(0)
+  }
+
+  70% {
+    transform: scale(1.1)
+  }
+
+  100% {
+    transform: scale(1)
+  }
+}
+
+.pop-in {
+  animation: popIn .35s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+/* Glow emerald */
+.glow-emerald {
+  text-shadow: 0 0 30px rgba(16, 185, 129, 0.45);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #10b981, #3b82f6 60%, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Tab button active default */
+.tab-btn.active {
+  background: #1f2937;
+  color: #fff;
+}
